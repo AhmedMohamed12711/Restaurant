@@ -1,15 +1,15 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36915.13 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestaurantsAPI", "RestaurantsAPI\RestaurantsAPI.csproj", "{A40CDC67-091C-4AB2-81D4-924AE18721D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rsestaurants.Domain", "..\Rsestaurants.Domain\Rsestaurants.Domain.csproj", "{FB2B5AC7-643C-4406-8AC7-C037B4854C5A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rsestaurants.Domain", "Rsestaurants.Domain\Rsestaurants.Domain.csproj", "{FB2B5AC7-643C-4406-8AC7-C037B4854C5A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Restaurants.Application", "..\Restaurants.Application\Restaurants.Application.csproj", "{C1DC4E70-0447-4B35-A05A-0B072EC5E637}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Restaurants.Application", "Restaurants.Application\Restaurants.Application.csproj", "{C1DC4E70-0447-4B35-A05A-0B072EC5E637}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Restaurants.Infrastructure", "..\Restaurants.Infrastructure\Restaurants.Infrastructure.csproj", "{5E860583-8D3B-4087-8D13-55453A8C5B35}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Restaurants.Infrastructure", "Restaurants.Infrastructure\Restaurants.Infrastructure.csproj", "{5E860583-8D3B-4087-8D13-55453A8C5B35}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
