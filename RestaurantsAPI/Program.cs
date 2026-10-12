@@ -1,6 +1,8 @@
-using Restaurants.Infrastructure.Seeders;
-using Restaurants.Infrastructure.Extensions;
 using Restaurants.Application.Extensions;
+using Restaurants.Infrastructure.Extensions;
+using Restaurants.Infrastructure.Seeders;
+using RestaurantsAPI.Middlewares;
+using Serilog;
 namespace RestaurantsAPI
 {
     public  class Program
@@ -16,9 +18,15 @@ namespace RestaurantsAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddScoped<ErrorHandlingMiddleware>();
+            builder.Services.AddScoped<RequestTimeLoggingMiddleware>();
+
             builder.Services.AddInfrastructure(builder.Configuration);
             builder.Services.AddApplication();
-
+            builder.Host.UseSerilog((context, configuration) =>
+            {
+                configuration.ReadFrom.Configuration(context.Configuration);
+            });
 
             var app = builder.Build();
 
@@ -27,12 +35,17 @@ namespace RestaurantsAPI
 
             await seeder.Seed();
             // Configure the HTTP request pipeline.
+            app.UseMiddleware<ErrorHandlingMiddleware>();
+            app.UseMiddleware<RequestTimeLoggingMiddleware>();
+
+
+            app.UseSerilogRequestLogging();
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
