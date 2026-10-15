@@ -1,6 +1,8 @@
 using Restaurants.Application.Extensions;
+using Restaurants.Domain.Entities;
 using Restaurants.Infrastructure.Extensions;
 using Restaurants.Infrastructure.Seeders;
+using RestaurantsAPI.Extentions;
 using RestaurantsAPI.Middlewares;
 using Serilog;
 namespace RestaurantsAPI
@@ -13,21 +15,9 @@ namespace RestaurantsAPI
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
-
-            builder.Services.AddScoped<ErrorHandlingMiddleware>();
-            builder.Services.AddScoped<RequestTimeLoggingMiddleware>();
-
             builder.Services.AddInfrastructure(builder.Configuration);
             builder.Services.AddApplication();
-            builder.Host.UseSerilog((context, configuration) =>
-            {
-                configuration.ReadFrom.Configuration(context.Configuration);
-            });
-
+            builder.AddPresentation();
             var app = builder.Build();
 
             var scope = app.Services.CreateScope();
@@ -48,6 +38,9 @@ namespace RestaurantsAPI
             
             app.UseHttpsRedirection();
 
+            app.MapGroup("api/identity").
+                WithTags("Identity")
+                .MapIdentityApi<User>();
             app.UseAuthorization();
 
 
