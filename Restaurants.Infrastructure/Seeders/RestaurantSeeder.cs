@@ -1,4 +1,7 @@
-﻿using Restaurants.Domain.Entities;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Restaurants.Domain.Constants;
+using Restaurants.Domain.Entities;
 using Restaurants.Infrastructure.Persistence;
 
 namespace Restaurants.Infrastructure.Seeders;
@@ -7,6 +10,11 @@ internal class RestaurantSeeder(RestaurantsDbContext dbContext) : IRestaurantSee
 {
     public async Task Seed()
     {
+        if (dbContext.Database.GetPendingMigrations().Any())
+        {
+            await dbContext.Database.MigrateAsync();
+        }
+
         if (await dbContext.Database.CanConnectAsync())
         {
             if (!dbContext.Restaurants.Any())
@@ -15,14 +23,48 @@ internal class RestaurantSeeder(RestaurantsDbContext dbContext) : IRestaurantSee
                 dbContext.Restaurants.AddRange(restaurants);
                 await dbContext.SaveChangesAsync();
             }
+
+            if (!dbContext.Roles.Any())
+            {
+                var roles = GetRoles();
+                dbContext.Roles.AddRange(roles);
+                await dbContext.SaveChangesAsync();
+            }
         }
+    }
+
+    private IEnumerable<IdentityRole> GetRoles()
+    {
+        List<IdentityRole> roles =
+            [
+                new (UserRoles.User)
+                {
+                    NormalizedName = UserRoles.User.ToUpper()
+                },
+                new (UserRoles.Owner)
+                {
+                    NormalizedName = UserRoles.Owner.ToUpper()
+                },
+                new (UserRoles.Admin)
+                {
+                    NormalizedName = UserRoles.Admin.ToUpper()
+                },
+            ];
+
+        return roles;
     }
 
     private IEnumerable<Restaurant> GetRestaurants()
     {
+        User owner = new User()
+        {
+            Email = "seed-user@test.com"
+        };
+
         List<Restaurant> restaurants = [
             new()
             {
+                Owner = owner,
                 Name = "KFC",
                 Category = "Fast Food",
                 Description =
@@ -50,10 +92,12 @@ internal class RestaurantSeeder(RestaurantsDbContext dbContext) : IRestaurantSee
                     City = "London",
                     Street = "Cork St 5",
                     PostalCode = "WC2N 5DU"
-                }
+                },
+
             },
             new ()
             {
+                Owner = owner,
                 Name = "McDonald",
                 Category = "Fast Food",
                 Description =

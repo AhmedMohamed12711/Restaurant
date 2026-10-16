@@ -1,4 +1,5 @@
 ﻿using Microsoft.OpenApi;
+using Restaurants.API.Middlewares;
 using RestaurantsAPI.Middlewares;
 using Serilog;
 

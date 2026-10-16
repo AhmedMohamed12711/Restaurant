@@ -1,20 +1,27 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
-using Restaurants.Domain.Entities;
 using Restaurants.Domain.Exceptions;
+using Restaurants.Domain.Interfaces;
+using Rsestaurants.Domain.Constants;
+using Rsestaurants.Domain.Excpetions;
 using Rsestaurants.Domain.Repositories;
 
 namespace Restaurants.Application.Restaurants.Commands.DeleteRestaurant;
 
-public class DeleteRestaurantCommandHandler(ILogger<DeleteRestaurantCommandHandler> logger
-    , IRestaurantsRepository restaurantsRepository) : IRequestHandler<DeleteRestaurantCommand>
+public class DeleteRestaurantCommandHandler(ILogger<DeleteRestaurantCommandHandler> logger,
+    IRestaurantsRepository restaurantsRepository,
+    IRestaurantAuthorizationService restaurantAuthorizationService) : IRequestHandler<DeleteRestaurantCommand>
 {
     public async Task Handle(DeleteRestaurantCommand request, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Deleting Retuarant with Id : {@RestuarantId}",request.Id);
-        var restaurant=await restaurantsRepository.GetByIdAsync(request.Id);
-        if (restaurant == null)
-            throw new NotFoundException(nameof(Restaurant),request.Id.ToString());
+        logger.LogInformation("Deleting restaurant with id: {RestaurantId}", request.Id);
+        var restaurant = await restaurantsRepository.GetByIdAsync(request.Id);
+        if (restaurant is null)
+            throw new NotFoundException(nameof(Restaurant), request.Id.ToString());
+
+        if (!restaurantAuthorizationService.Authorize(restaurant, ResourceOperation.Delete))
+            throw new ForbidException();
+
         await restaurantsRepository.Delete(restaurant);
     }
 }

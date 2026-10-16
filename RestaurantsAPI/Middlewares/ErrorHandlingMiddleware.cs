@@ -1,28 +1,35 @@
-﻿using Restaurants.Domain.Exceptions;
+﻿
+using Restaurants.Domain.Exceptions;
+using Rsestaurants.Domain.Excpetions;
 
-namespace RestaurantsAPI.Middlewares
+namespace Restaurants.API.Middlewares;
+
+public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : IMiddleware
 {
-    public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger ) : IMiddleware
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        try
         {
-            try
-            {
-               await next.Invoke(context);
-            }
-            catch (NotFoundException notFound)
-            {
-                context.Response.StatusCode = 404;
-                await context.Response.WriteAsync(notFound.Message);
+            await next.Invoke(context);
+        }
+        catch (NotFoundException notFound)
+        {
+            context.Response.StatusCode = 404;
+            await context.Response.WriteAsync(notFound.Message);
 
-                logger.LogWarning(notFound.Message);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, ex.Message);
-                context.Response.StatusCode = 500;
-                await context.Response.WriteAsync("something went wrong");
-            }
+            logger.LogWarning(notFound.Message);
+        }
+        catch (ForbidException)
+        {
+            context.Response.StatusCode = 403;
+            await context.Response.WriteAsync("Access forbidden");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, ex.Message);
+
+            context.Response.StatusCode = 500;
+            await context.Response.WriteAsync("Something went wrong");
         }
     }
 }
