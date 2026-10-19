@@ -1,10 +1,15 @@
 @RestaurantsAPI_HostAddress = https://localhost:7147
 
-GET {{RestaurantsAPI_HostAddress}}/weatherforecast/
-Accept: application/json
+POST {{RestaurantsAPI_HostAddress}}/api/identity/register
+Content-Type: application/json
+
+{
+  "email": "new.user@example.com",
+  "password": "P@ssword123"
+}
 
 ###
 
-GET {{RestaurantsAPI_HostAddress}}/api/restaurant
+GET {{RestaurantsAPI_HostAddress}}/api/restaurants?PageNumber=1&PageSize=10
 
 ###

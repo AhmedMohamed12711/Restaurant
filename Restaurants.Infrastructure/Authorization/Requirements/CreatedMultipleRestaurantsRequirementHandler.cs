@@ -12,9 +12,15 @@ namespace Restaurants.Infrastructure.Authorization.Requirements
         {
             var currentUser = userContext.GetCurrentUser();
 
+            if (currentUser is null)
+            {
+                context.Fail();
+                return;
+            }
+
             var restaurants = await restaurantsRepository.GetAllAsync();
 
-            var userRestaurantsCreated = restaurants.Count(r => r.OwnerId == currentUser!.Id);
+            var userRestaurantsCreated = restaurants.Count(r => r.OwnerId == currentUser.Id);
 
             if (userRestaurantsCreated >= requirement.MinimumRestaurantsCreated)
             {

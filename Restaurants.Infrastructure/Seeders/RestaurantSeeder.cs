@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Restaurants.Domain.Constants;
 using Restaurants.Domain.Entities;
@@ -61,57 +61,95 @@ internal class RestaurantSeeder(RestaurantsDbContext dbContext) : IRestaurantSee
             Email = "seed-user@test.com"
         };
 
-        List<Restaurant> restaurants = [
-            new()
+        string[] names = [
+            "KFC", "McDonald's", "Burger King", "Pizza Hut", "Domino's",
+            "Subway", "Taco Bell", "Wendy's", "Chick-fil-A", "Popeyes",
+            "Panda Express", "Five Guys", "Shake Shack", "Chipotle", "Olive Garden",
+            "Red Lobster", "Applebee's", "Denny's", "IHOP", "Outback Steakhouse",
+            "The Cheesecake Factory", "Buffalo Wild Wings", "TGI Friday's", "Cracker Barrel", "Waffle House",
+            "Nando's", "Wagamama", "Zizzi", "Pizza Express", "Greggs",
+            "Leon", "Tortilla", "Honest Burgers", "Byron", "GBK",
+            "Patty & Bun", "Flat Iron", "Dishoom", "Hawksmoor", "The Ivy",
+            "Nobu", "Hakkasan", "Yo Sushi", "Itsu", "Wasabi",
+            "Sushi Samba", "Roka", "Benihana", "Busaba", "Rosa's Thai",
+        ];
+
+        string[] categories = [
+            "Fast Food", "Italian", "Japanese", "Mexican", "Chinese",
+            "Indian", "Thai", "Mediterranean", "Steakhouse", "Seafood",
+            "Vegetarian", "Vegan", "American", "French", "Korean",
+            "Middle Eastern", "Greek", "Turkish", "Brazilian", "Spanish"
+        ];
+
+        string[] cities = [
+            "London", "Manchester", "Birmingham", "Leeds", "Liverpool",
+            "Glasgow", "Edinburgh", "Bristol", "Cardiff", "Belfast",
+            "Cairo", "Alexandria", "Dubai", "New York", "Paris",
+            "Berlin", "Tokyo", "Sydney", "Toronto", "Rome"
+        ];
+
+        string[] streets = [
+            "Oxford St", "High St", "King's Rd", "Baker St", "Elm St",
+            "Park Ave", "Main St", "Broadway", "Church Rd", "Victoria St",
+            "Queen St", "Regent St", "Bond St", "Fleet St", "Piccadilly",
+            "Strand", "Whitehall", "Kensington Rd", "Chelsea Blvd", "Camden Rd"
+        ];
+
+        string[] dishNames = [
+            "Classic Burger", "Grilled Chicken", "Caesar Salad", "Margherita Pizza",
+            "Fish & Chips", "Pad Thai", "Sushi Platter", "Tacos Al Pastor",
+            "Lamb Kebab", "Chicken Wings", "Steak Frites", "Pasta Carbonara",
+            "Tom Yum Soup", "Biryani", "Falafel Wrap", "Ramen Bowl",
+            "BBQ Ribs", "Greek Salad", "Shawarma Plate", "Dim Sum Basket"
+        ];
+
+        var restaurants = new List<Restaurant>();
+        var random = new Random(42); // fixed seed for reproducibility
+
+        for (int i = 0; i < 100; i++)
+        {
+            var nameIndex = i % names.Length;
+            var categoryIndex = i % categories.Length;
+            var cityIndex = i % cities.Length;
+            var streetIndex = i % streets.Length;
+
+            // Make names unique by appending a branch number when we cycle through
+            var branchNumber = i / names.Length;
+            var restaurantName = branchNumber == 0 ? names[nameIndex] : $"{names[nameIndex]} - Branch {branchNumber + 1}";
+
+            var restaurant = new Restaurant()
             {
                 Owner = owner,
-                Name = "KFC",
-                Category = "Fast Food",
-                Description =
-                    "KFC (short for Kentucky Fried Chicken) is an American fast food restaurant chain headquartered in Louisville, Kentucky, that specializes in fried chicken.",
-                ContactEmail = "contact@kfc.com",
-                HasDelivery = true,
+                Name = restaurantName,
+                Category = categories[categoryIndex],
+                Description = $"{restaurantName} is a popular {categories[categoryIndex].ToLower()} restaurant known for its excellent food and great service. Located in {cities[cityIndex]}.",
+                ContactEmail = $"contact{i + 1}@{names[nameIndex].ToLower().Replace(" ", "").Replace("'", "").Replace("&", "and")}.com",
+                HasDelivery = i % 3 != 0, // ~66% have delivery
                 Dishes =
                 [
-                    new ()
+                    new()
                     {
-                        Name = "Nashville Hot Chicken",
-                        Description = "Nashville Hot Chicken (10 pcs.)",
-                        Price = 10.30M,
+                        Name = dishNames[i % dishNames.Length],
+                        Description = $"{dishNames[i % dishNames.Length]} - Chef's special",
+                        Price = Math.Round(5.00M + (decimal)(random.NextDouble() * 25), 2),
                     },
-
-                    new ()
+                    new()
                     {
-                        Name = "Chicken Nuggets",
-                        Description = "Chicken Nuggets (5 pcs.)",
-                        Price = 5.30M,
+                        Name = dishNames[(i + 7) % dishNames.Length],
+                        Description = $"{dishNames[(i + 7) % dishNames.Length]} - House favorite",
+                        Price = Math.Round(4.00M + (decimal)(random.NextDouble() * 20), 2),
                     },
                 ],
-                Address = new ()
+                Address = new()
                 {
-                    City = "London",
-                    Street = "Cork St 5",
-                    PostalCode = "WC2N 5DU"
+                    City = cities[cityIndex],
+                    Street = $"{streets[streetIndex]} {i + 1}",
+                    PostalCode = $"{(char)('A' + cityIndex % 26)}{random.Next(1, 9)}{random.Next(1, 9)} {random.Next(1, 9)}{(char)('A' + random.Next(0, 26))}{(char)('A' + random.Next(0, 26))}"
                 },
+            };
 
-            },
-            new ()
-            {
-                Owner = owner,
-                Name = "McDonald",
-                Category = "Fast Food",
-                Description =
-                    "McDonald's Corporation (McDonald's), incorporated on December 21, 1964, operates and franchises McDonald's restaurants.",
-                ContactEmail = "contact@mcdonald.com",
-                HasDelivery = true,
-                Address = new Address()
-                {
-                    City = "London",
-                    Street = "Boots 193",
-                    PostalCode = "W1F 8SR"
-                }
-            }
-        ];
+            restaurants.Add(restaurant);
+        }
 
         return restaurants;
     }

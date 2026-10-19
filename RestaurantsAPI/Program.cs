@@ -42,6 +42,7 @@ namespace RestaurantsAPI
             app.MapGroup("api/identity").
                 WithTags("Identity")
                 .MapIdentityApi<User>();
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

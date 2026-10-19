@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Restaurants.Application.Users;
 using Restaurants.Domain.Constants;
 using Restaurants.Domain.Entities;
 using Restaurants.Domain.Interfaces;
+using Rsestaurants.Domain.Constants;
 
 namespace Restaurants.Infrastructure.Authorization.Services;
 
@@ -13,6 +14,12 @@ public class RestaurantAuthorizationService(ILogger<RestaurantAuthorizationServi
     public bool Authorize(Restaurant restaurant, ResourceOperation resourceOperation)
     {
         var user = userContext.GetCurrentUser();
+
+        if (user is null)
+        {
+            logger.LogWarning("Authorization failed because there is no authenticated user context");
+            return false;
+        }
 
         logger.LogInformation("Authorizing user {UserEmail}, to {Operation} for restaurant {RestaurantName}",
             user.Email,

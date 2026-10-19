@@ -24,6 +24,10 @@ public class RestaurantsDbContext(DbContextOptions<RestaurantsDbContext> options
             .WithOne()
             .HasForeignKey(d => d.RestaurantId);
 
+        modelBuilder.Entity<Dish>()
+            .Property(d => d.Price)
+            .HasPrecision(18, 2);
+
         modelBuilder.Entity<User>()
             .HasMany(o => o.OwnedRestaurants)
             .WithOne(r => r.Owner)

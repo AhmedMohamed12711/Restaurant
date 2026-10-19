@@ -24,6 +24,13 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
             context.Response.StatusCode = 403;
             await context.Response.WriteAsync("Access forbidden");
         }
+        catch (BadHttpRequestException ex)
+        {
+            logger.LogWarning(ex, "Invalid request body or parameters");
+
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsync("The request is invalid. Ensure the JSON body is valid.");
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, ex.Message);
