@@ -1,0 +1,60 @@
+name: .NET CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore Dependencies
+      run: dotnet restore RestaurantsAPI.sln
+
+    - name: Build Solution
+      run: dotnet build RestaurantsAPI.sln --configuration Release --no-restore
+
+    - name: Run Unit & Integration Tests
+      run: dotnet test RestaurantsAPI.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage"
+
+    - name: Publish API
+      run: dotnet publish src/RestaurantsAPI/RestaurantsAPI.csproj -c Release -o ./publish
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: restaurants-api-build
+        path: ./publish
+
+  # Optional deploy stage to Azure Web App
+  deploy-azure:
+    name: Deploy to Azure App Service
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Build Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: restaurants-api-build
+        path: ./publish
+
+    # Deploy step template for Azure Cloud (configured via repository secrets)
+    # - name: Deploy to Azure Web App
+    #   uses: azure/webapps-deploy@v3
+    #   with:
+    #     app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+    #     publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+    #     package: ./publish

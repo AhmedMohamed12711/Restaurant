@@ -4,7 +4,7 @@ using Rsestaurants.Domain.Repositories;
 
 namespace Restaurants.Infrastructure.Authorization.Requirements
 {
-    internal class CreatedMultipleRestaurantsRequirementHandler(IRestaurantsRepository restaurantsRepository,
+    public class CreatedMultipleRestaurantsRequirementHandler(IRestaurantsRepository restaurantsRepository,
         IUserContext userContext) : AuthorizationHandler<CreatedMultipleRestaurantsRequirement>
     {
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
